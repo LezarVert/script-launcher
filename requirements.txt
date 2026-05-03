@@ -1,0 +1,7 @@
+# Requirements pour Script Launcher
+# 
+# Dépendances système :
+# - python3-tk (sur Ubuntu/Debian : sudo apt-get install python3-tk)
+# 
+# Dépendances Python :
+ttkbootstrap>=1.10.0

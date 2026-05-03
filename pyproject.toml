@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "script-launcher"
+version = "1.0.0"
+description = "Application GUI moderne pour gérer et exécuter vos scripts"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Vincent"},
+]
+maintainers = [
+    {name = "Vincent"},
+]
+classifiers = [
+    "Development Status :: Prod",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Tools",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Environment :: X11 Applications",
+    "Environment :: Win32 (MS Windows)",
+]
+keywords = ["script", "launcher", "gui", "tkinter", "ttkbootstrap"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/LezarVert/script-launcher"
+Repository = "https://github.com/LezarVert/script-launcher.git"
+Issues = "https://github.com/LezarVert/script-launcher/issues"
+Documentation = "https://github.com/LezarVert/script-launcher#readme"
+
+[tool.setuptools.packages.find]
+where = ["dev-tools-python"]
+include = ["script_launcher*"]
+
+[tool.setuptools.package-dir]
+"" = "dev-tools-python"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["script_launcher"]
+omit = ["*/tests/*", "*/test_*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

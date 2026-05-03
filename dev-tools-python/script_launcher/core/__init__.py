@@ -1,0 +1,1 @@
+"""Package core contenant la logique métier."""

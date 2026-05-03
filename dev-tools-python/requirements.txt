@@ -1,0 +1,5 @@
+ttkbootstrap>=1.10.1
+Pillow>=10.0.0
+pyinstaller>=6.0.0; platform_system == "Linux" or platform_system == "Windows"
+pytest>=7.4.0; extra == "dev"
+pytest-cov>=4.1.0; extra == "dev"
