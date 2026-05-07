@@ -108,6 +108,24 @@ chmod +x run.sh
 ./run.sh
 ```
 
+### Intégration au menu d'applications (Linux)
+
+Un fichier `.desktop` est fourni pour lancer l'application depuis le menu d'applications. Pour l'installer :
+
+```bash
+# Copier les fichiers .desktop
+cp Script-Launcher.desktop ~/.local/share/applications/
+cp dev-tools-python/script-launcher.desktop ~/.local/share/applications/
+
+# Rafraîchir le cache
+update-desktop-database ~/.local/share/applications/
+```
+
+**Note importante :** L'application utilise un wrapper `launcher.sh` pour éviter le curseur de chargement (sablier) au démarrage. Ce wrapper :
+- Lance Python en arrière-plan immédiatement
+- Désactive la notification de démarrage (`StartupNotify=false`)
+- Affiche correctement l'icône `rocket.png`
+
 ### Build avec PyInstaller
 
 Le fichier `.spec` est déjà configuré avec les imports cachés nécessaires :

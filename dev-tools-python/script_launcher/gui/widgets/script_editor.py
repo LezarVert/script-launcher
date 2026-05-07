@@ -8,7 +8,7 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from ttkbootstrap.scrolled import ScrolledText
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional
 
 from .console_log import ConsoleLog
 
@@ -26,7 +26,8 @@ class ScriptEditor(ttk.Frame):
         on_save: Optional[Callable[[], None]] = None,
         on_run: Optional[Callable[[], None]] = None,
         on_delete: Optional[Callable[[], None]] = None,
-        on_mode_change: Optional[Callable[[str], None]] = None
+        on_mode_change: Optional[Callable[[str], None]] = None,
+        icons: Optional[Dict] = None
     ):
         """Initialise l'éditeur de script.
         
@@ -36,6 +37,7 @@ class ScriptEditor(ttk.Frame):
             on_run: Callback appelé pour exécuter le script
             on_delete: Callback appelé pour supprimer le script
             on_mode_change: Callback appelé quand le mode change ('welcome' ou 'edit')
+            icons: Dictionnaire d'icônes PhotoImage
         """
         super().__init__(master, padding=10)
         
@@ -44,6 +46,7 @@ class ScriptEditor(ttk.Frame):
         self.on_run_callback = on_run or (lambda: None)
         self.on_delete_callback = on_delete or (lambda: None)
         self.on_mode_change_callback = on_mode_change
+        self.icons = icons or {}
         
         # Configuration de la grille
         self.grid_columnconfigure(0, weight=1)
@@ -57,13 +60,13 @@ class ScriptEditor(ttk.Frame):
         self.main_header.grid_columnconfigure(1, weight=1)
         
         # Icône et titre (modifiables)
-        self.header_icon = ttk.Label(self.main_header, text="📝", font=("Segoe UI", 20))
+        self.header_icon = ttk.Label(self.main_header, image=self.icons.get("pencil"))
         self.header_icon.grid(row=0, column=0, padx=(0, 10))
         
         self.header_title = ttk.Label(
             self.main_header, 
             text="Éditeur de script", 
-            font=("Segoe UI", 12, "bold")
+            font=("DejaVu Sans", 12, "bold")
         )
         self.header_title.grid(row=0, column=1, sticky="w")
         
@@ -80,14 +83,14 @@ class ScriptEditor(ttk.Frame):
         ttk.Label(
             self.metadata_frame, 
             text="Nom:", 
-            font=("Segoe UI", 10, "bold")
+            font=("DejaVu Sans", 10, "bold")
         ).grid(row=0, column=1, padx=5, pady=5, sticky="e")
         
         self.name_var = tk.StringVar()
         self.name_entry = ttk.Entry(
             self.metadata_frame, 
             textvariable=self.name_var, 
-            font=("Segoe UI", 10)
+            font=("DejaVu Sans", 10)
         )
         self.name_entry.grid(row=0, column=2, padx=5, pady=5, sticky="ew")
         
@@ -95,14 +98,14 @@ class ScriptEditor(ttk.Frame):
         ttk.Label(
             self.metadata_frame, 
             text="Description:", 
-            font=("Segoe UI", 10, "bold")
+            font=("DejaVu Sans", 10, "bold")
         ).grid(row=1, column=1, padx=5, pady=5, sticky="e")
         
         self.desc_var = tk.StringVar()
         self.desc_entry = ttk.Entry(
             self.metadata_frame, 
             textvariable=self.desc_var, 
-            font=("Segoe UI", 10)
+            font=("DejaVu Sans", 10)
         )
         self.desc_entry.grid(row=1, column=2, padx=5, pady=5, sticky="ew")
         
@@ -110,14 +113,14 @@ class ScriptEditor(ttk.Frame):
         ttk.Label(
             self.metadata_frame, 
             text="Auteur:", 
-            font=("Segoe UI", 10, "bold")
+            font=("DejaVu Sans", 10, "bold")
         ).grid(row=2, column=1, padx=5, pady=5, sticky="e")
         
         self.author_var = tk.StringVar()
         self.author_entry = ttk.Entry(
             self.metadata_frame, 
             textvariable=self.author_var, 
-            font=("Segoe UI", 10)
+            font=("DejaVu Sans", 10)
         )
         self.author_entry.grid(row=2, column=2, padx=5, pady=5, sticky="ew")
         
@@ -125,7 +128,7 @@ class ScriptEditor(ttk.Frame):
         ttk.Label(
             self.metadata_frame, 
             text="Type:", 
-            font=("Segoe UI", 10, "bold")
+            font=("DejaVu Sans", 10, "bold")
         ).grid(row=3, column=1, padx=5, pady=5, sticky="e")
         
         self.type_var = tk.StringVar(value="python")
@@ -134,7 +137,9 @@ class ScriptEditor(ttk.Frame):
         
         ttk.Radiobutton(
             type_frame, 
-            text="🐍 Python", 
+            image=self.icons.get("python"),
+            text="Python",
+            compound="left",
             variable=self.type_var, 
             value="python", 
             bootstyle="success"
@@ -142,7 +147,9 @@ class ScriptEditor(ttk.Frame):
         
         ttk.Radiobutton(
             type_frame, 
-            text="🐚 Shell", 
+            image=self.icons.get("shell"),
+            text="Shell",
+            compound="left",
             variable=self.type_var, 
             value="shell", 
             bootstyle="info"
@@ -154,22 +161,28 @@ class ScriptEditor(ttk.Frame):
         
         self.created_label = ttk.Label(
             self.dates_frame, 
-            text="📅 Créé: -", 
-            font=("Segoe UI", 9)
+            text=" Créé: -", 
+            image=self.icons.get("calendar"),
+            compound="left",
+            font=("DejaVu Sans", 9)
         )
         self.created_label.pack(side="left", padx=10)
         
         self.modified_label = ttk.Label(
             self.dates_frame, 
-            text="✏️ Modifié: -", 
-            font=("Segoe UI", 9)
+            text=" Modifié: -", 
+            image=self.icons.get("edit"),
+            compound="left",
+            font=("DejaVu Sans", 9)
         )
         self.modified_label.pack(side="left", padx=10)
         
         self.executed_label = ttk.Label(
             self.dates_frame, 
-            text="▶️ Exécuté: -", 
-            font=("Segoe UI", 9)
+            text=" Exécuté: -", 
+            image=self.icons.get("played"),
+            compound="left",
+            font=("DejaVu Sans", 9)
         )
         self.executed_label.pack(side="left", padx=10)
         
@@ -179,14 +192,13 @@ class ScriptEditor(ttk.Frame):
         
         ttk.Label(
             self.code_header, 
-            text="💻", 
-            font=("Segoe UI", 16)
+            image=self.icons.get("code")
         ).grid(row=0, column=0, padx=(0, 5))
         
         ttk.Label(
             self.code_header, 
             text="Éditeur de code", 
-            font=("Segoe UI", 11, "bold")
+            font=("DejaVu Sans", 11, "bold")
         ).grid(row=0, column=1, sticky="w")
         
         self.code_frame = ttk.Frame(self)
@@ -209,12 +221,14 @@ class ScriptEditor(ttk.Frame):
         
         ttk.Label(
             self.console_header, 
-            text="🖥️ Console de sortie", 
-            font=("Segoe UI", 12, "bold")
+            text=" Console de sortie", 
+            image=self.icons.get("terminal"),
+            compound="left",
+            font=("DejaVu Sans", 12, "bold")
         ).pack(side="left", padx=5)
         
         # Widget console
-        self.console = ConsoleLog(self)
+        self.console = ConsoleLog(self, icons=self.icons)
         
         # === BARRE D'ACTIONS (Boutons Enregistrer, Exécuter, Supprimer) ===
         self.button_frame = ttk.Frame(self)
@@ -223,8 +237,10 @@ class ScriptEditor(ttk.Frame):
         # Boutons avec icônes et style moderne
         btn_save = ttk.Button(
             self.button_frame,
-            text="💾 Enregistrer",
-            command=self.on_save_callback,  # Utilise le callback
+            text=" Enregistrer",
+            image=self.icons.get("save"),
+            compound="left",
+            command=self.on_save_callback,
             bootstyle="primary",
             width=18
         )
@@ -232,8 +248,10 @@ class ScriptEditor(ttk.Frame):
         
         btn_run = ttk.Button(
             self.button_frame,
-            text="▶️ Exécuter",
-            command=self.on_run_callback,  # Utilise le callback
+            text=" Exécuter",
+            image=self.icons.get("run"),
+            compound="left",
+            command=self.on_run_callback,
             bootstyle="success",
             width=18
         )
@@ -241,8 +259,10 @@ class ScriptEditor(ttk.Frame):
         
         btn_delete = ttk.Button(
             self.button_frame,
-            text="🗑️ Supprimer",
-            command=self.on_delete_callback,  # Utilise le callback
+            text=" Supprimer",
+            image=self.icons.get("delete"),
+            compound="left",
+            command=self.on_delete_callback,
             bootstyle="danger",
             width=18
         )
@@ -291,10 +311,10 @@ class ScriptEditor(ttk.Frame):
         self.author_var.set(author)
         self.type_var.set(script_type)
         
-        self.created_label.configure(text=f"📅 Créé: {created[:10] if created else '-'}")
-        self.modified_label.configure(text=f"✏️ Modifié: {modified[:10] if modified else '-'}")
+        self.created_label.configure(text=f" Créé: {created[:10] if created else '-'}")
+        self.modified_label.configure(text=f" Modifié: {modified[:10] if modified else '-'}")
         self.executed_label.configure(
-            text=f"▶️ Exécuté: {executed[:10] if executed else '-'}"
+            text=f" Exécuté: {executed[:10] if executed else '-'}"
         )
         
         self.code_editor.delete("1.0", "end")
@@ -329,8 +349,7 @@ class ScriptEditor(ttk.Frame):
             # Logo fusée
             rocket_label = ttk.Label(
                 inner_frame,
-                text="🚀",
-                font=("Segoe UI", 80)
+                image=self.icons.get("rocket_xl")
             )
             rocket_label.pack(pady=(50, 20))
             
@@ -338,7 +357,7 @@ class ScriptEditor(ttk.Frame):
             title_label = ttk.Label(
                 inner_frame,
                 text="Bienvenue dans Script Launcher",
-                font=("Segoe UI", 24, "bold")
+                font=("DejaVu Sans", 24, "bold")
             )
             title_label.pack(pady=(0, 10))
             
@@ -346,7 +365,7 @@ class ScriptEditor(ttk.Frame):
             subtitle_label = ttk.Label(
                 inner_frame,
                 text="Sélectionnez un script dans la liste ou créez-en un nouveau",
-                font=("Segoe UI", 12)
+                font=("DejaVu Sans", 12)
             )
             subtitle_label.pack(pady=(0, 50))
         
@@ -375,7 +394,7 @@ class ScriptEditor(ttk.Frame):
         """Vide le contenu de la console (Vue)."""
         self.console.delete("1.0", "end")
     
-    def set_header(self, title: str, icon: str = "📝"):
+    def set_header(self, title: str, icon: str = "✎"):
         """Modifie le titre et l'icône de l'en-tête.
         
         Args:

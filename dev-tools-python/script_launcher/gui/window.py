@@ -12,6 +12,7 @@ import sys
 from script_launcher.core.script_manager import ScriptManager
 from script_launcher.core.executor import ScriptExecutor
 from script_launcher.gui.widgets import ScriptList, ScriptEditor
+from script_launcher.utils.icons import load_app_icons
 
 class Window(ttk.Window):
     def __init__(self, scripts_base_path: Optional[str] = None):
@@ -25,6 +26,18 @@ class Window(ttk.Window):
         
         # Initialiser avec le thème sauvegardé ou darkly par défaut
         super().__init__(themename=saved_theme if saved_theme else "darkly")
+
+        # Pré-créer les styles pour éviter un segfault dans ttkbootstrap
+        # (bug connu avec la création de styles à la volée sur Tcl/Tk 8.6.12)
+        for color in ['primary', 'success', 'info', 'warning', 'danger', 'dark', 'light', 'secondary']:
+            self.style.configure(f'{color}.TButton')
+            self.style.configure(f'{color}.TLabel')
+            self.style.configure(f'{color}.TEntry')
+            self.style.configure(f'{color}.TFrame')
+            self.style.configure(f'{color}.TLabelframe')
+
+        # Charger les icônes emoji via PIL (Tk 8.6 ne supporte pas les emojis)
+        self.icons = load_app_icons()
 
         def get_resource_path(relative_path):
             """Obtient le chemin absolu, que ce soit en mode dev ou compilé."""
@@ -51,12 +64,12 @@ class Window(ttk.Window):
             print(f"Impossible de charger l'icône: {e}")
         
         # Configuration de la fenêtre principale
-        self.title("Script Launcher")
+        # self.title("Script Launcher")
+        self.title("🚀 Script Launcher")
         self.geometry("1400x1024")
         self.minsize(1400, 1024)
         
-        self.title("🚀 Script Launcher")
-        self.geometry("1200x800")
+        # self.geometry("1200x800")
         
         # Liste des thèmes disponibles
         self.themes = ["darkly", "superhero", "solar", "flatly"]
@@ -164,7 +177,7 @@ class Window(ttk.Window):
         self.current_theme_index = (self.current_theme_index + 1) % len(self.themes)
         new_theme = self.themes[self.current_theme_index]
         self.style.theme_use(new_theme)
-        self.theme_button.configure(text=f"🎨 {new_theme.title()}")
+        self.theme_button.configure(text=f" {new_theme.title()}")
         # Sauvegarder le thème
         self._save_theme_preference(new_theme)
         
@@ -214,14 +227,17 @@ class Window(ttk.Window):
             right_frame,
             on_save=self._save_current_script,
             on_run=self._run_current_script,
-            on_delete=self._delete_current_script
+            on_delete=self._delete_current_script,
+            icons=self.icons
         )
         self.editor.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         
         # Ajouter le bouton thème dans l'en-tête de l'éditeur
         self.theme_button = ttk.Button(
             self.editor.header_buttons,
-            text="🎨 Thème",
+            text=" Thème",
+            image=self.icons.get("palette"),
+            compound="left",
             command=self._toggle_theme,
             bootstyle="info",
             width=12
@@ -237,8 +253,10 @@ class Window(ttk.Window):
         # Titre de l'application
         title_label = ttk.Label(
             left_frame,
-            text="🚀 Script Launcher",
-            font=("Segoe UI", 16, "bold"),
+            text="  Script Launcher",
+            image=self.icons.get("rocket"),
+            compound="left",
+            font=("DejaVu Sans", 16, "bold"),
             anchor="center"
         )
         title_label.grid(row=0, column=0, sticky="ew", pady=15, padx=15)
@@ -246,7 +264,9 @@ class Window(ttk.Window):
         # Bouton nouveau script moderne
         new_button = ttk.Button(
             left_frame,
-            text="＋ Nouveau script",
+            text=" Nouveau script",
+            image=self.icons.get("new"),
+            compound="left",
             command=self._new_script_dialog,
             bootstyle="success",
             width=25
@@ -260,8 +280,10 @@ class Window(ttk.Window):
         # Liste des scripts avec titre
         list_label = ttk.Label(
             left_frame,
-            text="📜 Scripts disponibles",
-            font=("Segoe UI", 10, "bold")
+            text="  Scripts disponibles",
+            image=self.icons.get("scroll"),
+            compound="left",
+            font=("DejaVu Sans", 10, "bold")
         )
         list_label.grid(row=3, column=0, sticky="w", padx=5, pady=(10, 5))
         
@@ -269,7 +291,8 @@ class Window(ttk.Window):
         self.script_list = ScriptList(
             left_frame,
             on_select=self._load_script,
-            on_execute=self._run_current_script
+            on_execute=self._run_current_script,
+            icons=self.icons
         )
         self.script_list.grid(row=4, column=0, sticky="nsew", padx=5, pady=5)
         
@@ -290,25 +313,25 @@ class Window(ttk.Window):
         main_frame.grid_columnconfigure(1, weight=1)
         
         # Formulaire
-        ttk.Label(main_frame, text="Nom:", font=("Segoe UI", 11, "bold")).grid(row=0, column=0, padx=5, pady=8, sticky="w")
+        ttk.Label(main_frame, text="Nom:", font=("DejaVu Sans", 11, "bold")).grid(row=0, column=0, padx=5, pady=8, sticky="w")
         name_var = tk.StringVar()
         ttk.Entry(main_frame, textvariable=name_var).grid(
             row=0, column=1, padx=5, pady=8, sticky="ew"
         )
         
-        ttk.Label(main_frame, text="Description:", font=("Segoe UI", 11, "bold")).grid(row=1, column=0, padx=5, pady=8, sticky="w")
+        ttk.Label(main_frame, text="Description:", font=("DejaVu Sans", 11, "bold")).grid(row=1, column=0, padx=5, pady=8, sticky="w")
         desc_var = tk.StringVar()
         ttk.Entry(main_frame, textvariable=desc_var).grid(
             row=1, column=1, padx=5, pady=8, sticky="ew"
         )
         
-        ttk.Label(main_frame, text="Auteur:", font=("Segoe UI", 11, "bold")).grid(row=2, column=0, padx=5, pady=8, sticky="w")
+        ttk.Label(main_frame, text="Auteur:", font=("DejaVu Sans", 11, "bold")).grid(row=2, column=0, padx=5, pady=8, sticky="w")
         author_var = tk.StringVar()
         ttk.Entry(main_frame, textvariable=author_var).grid(
             row=2, column=1, padx=5, pady=8, sticky="ew"
         )
         
-        ttk.Label(main_frame, text="Type:", font=("Segoe UI", 11, "bold")).grid(row=3, column=0, padx=5, pady=8, sticky="w")
+        ttk.Label(main_frame, text="Type:", font=("DejaVu Sans", 11, "bold")).grid(row=3, column=0, padx=5, pady=8, sticky="w")
         type_var = tk.StringVar(value="python")
         type_frame = ttk.Frame(main_frame)
         type_frame.grid(row=3, column=1, padx=5, pady=8, sticky="w")
@@ -346,7 +369,9 @@ class Window(ttk.Window):
                 
         ttk.Button(
             main_frame,
-            text="✨ Créer",
+            text=" Créer",
+            image=self.icons.get("new"),
+            compound="left",
             command=create_script,
             bootstyle="success",
             width=20

@@ -13,7 +13,8 @@ class ScriptList(ttk.Frame):
         self, 
         master, 
         on_select: Callable[[str], None], 
-        on_execute: Callable[[str], None] = None
+        on_execute: Callable[[str], None] = None,
+        icons: Optional[Dict] = None
     ):
         """Initialise la liste des scripts.
         
@@ -21,12 +22,14 @@ class ScriptList(ttk.Frame):
             master: Widget parent
             on_select: Callback appelé quand un script est sélectionné
             on_execute: Callback appelé quand un script est exécuté
+            icons: Dictionnaire d'icônes PhotoImage
         """
         super().__init__(master, padding=10)
         
         # Initialisation des variables
         self.on_select_callback = on_select
         self.on_execute_callback = on_execute or (lambda x: None)
+        self.icons = icons or {}
         self.all_scripts: List[str] = []
         self.script_types: Dict[str, str] = {}  # Stocke le type de chaque script
         self.current_selected = None
@@ -44,14 +47,14 @@ class ScriptList(ttk.Frame):
         search_frame.grid_columnconfigure(1, weight=1)
         
         # Icône de recherche
-        search_icon = ttk.Label(search_frame, text="🔍", font=("Segoe UI", 12))
+        search_icon = ttk.Label(search_frame, image=self.icons.get("search"))
         search_icon.grid(row=0, column=0, sticky="w", padx=(0, 5))
         
         self.search_var = tk.StringVar()
         self.search_entry = ttk.Entry(
             search_frame,
             textvariable=self.search_var,
-            font=("Segoe UI", 10),
+            font=("DejaVu Sans", 10),
             bootstyle="primary"
         )
         self.search_entry.grid(row=0, column=1, sticky="ew", padx=5)
@@ -83,7 +86,7 @@ class ScriptList(ttk.Frame):
         self.counter_label = ttk.Label(
             self,
             text="0 script(s)",
-            font=("Segoe UI", 9)
+            font=("DejaVu Sans", 9)
         )
         self.counter_label.grid(row=1, column=0, sticky="w", pady=(0, 5))
         
@@ -178,12 +181,14 @@ class ScriptList(ttk.Frame):
         btn_container.pack(fill="x", pady=3, padx=2)
         
         # Icône selon le type
-        type_icon = "🐍" if script_type == "python" else "🐚"
+        type_icon = self.icons.get("python") if script_type == "python" else self.icons.get("shell")
         
         # Bouton principal avec icône
         left_btn = ttk.Button(
             btn_container,
-            text=f"{type_icon} {script_name}",
+            text=f" {script_name}",
+            image=type_icon,
+            compound="left",
             command=lambda s=script_name: self._on_select(s),
             bootstyle="success",
             width=28,
@@ -194,7 +199,9 @@ class ScriptList(ttk.Frame):
         # Bouton d'exécution rapide
         right_btn = ttk.Button(
             btn_container,
-            text="▶",
+            text=" ",
+            image=self.icons.get("run"),
+            compound="left",
             command=lambda s=script_name: self.on_execute_callback(s),
             bootstyle="success",
             width=4,
@@ -283,8 +290,8 @@ class ScriptList(ttk.Frame):
             if old_name in self.script_buttons:
                 container, left_btn, right_btn = self.script_buttons[old_name]
                 script_type = self.script_types.get(new_name, "python")
-                type_icon = "🐍" if script_type == "python" else "🐚"
-                left_btn.configure(text=f"{type_icon} {new_name}")
+                type_icon = self.icons.get("python") if script_type == "python" else self.icons.get("shell")
+                left_btn.configure(text=f" {new_name}", image=type_icon, compound="left")
                 left_btn.configure(command=lambda s=new_name: self._on_select(s))
                 right_btn.configure(command=lambda s=new_name: self.on_execute_callback(s))
                 self.script_buttons[new_name] = self.script_buttons.pop(old_name)

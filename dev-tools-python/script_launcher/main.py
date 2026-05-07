@@ -15,7 +15,7 @@ def main(scripts_base_path=None):
     # Déterminer le répertoire de base de l'application
     if scripts_base_path is None:
         app_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        scripts_dir = os.path.join(app_dir, "scripts")
+        scripts_base_path = os.path.join(app_dir, "scripts")
 
     os.makedirs(scripts_base_path, exist_ok=True)
     

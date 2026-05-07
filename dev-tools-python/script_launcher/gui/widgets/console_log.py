@@ -4,41 +4,28 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from ttkbootstrap.scrolled import ScrolledText
+from typing import Dict, Optional
 
 
 class ConsoleLog(ScrolledText):
     """Widget moderne pour afficher la sortie console."""
     
-    def __init__(self, master):
+    def __init__(self, master, icons: Optional[Dict] = None):
         """Initialise la console.
         
         Args:
             master: Widget parent
+            icons: Dictionnaire d'icônes PhotoImage
         """
+        self.icons = icons or {}
+        
         # Créer un Frame avec style moderne
         self.container = ttk.Frame(master, bootstyle="dark")
         
         # En-tête de la console
         header = ttk.Frame(self.container, bootstyle="dark")
         header.pack(fill="x", padx=5, pady=(5, 0))
-        
-        ttk.Label(
-            header, 
-            text="💻 Terminal", 
-            font=("Segoe UI", 11, "bold"), 
-            bootstyle="inverse-dark"
-        ).pack(side="left", padx=5)
-        
-        # Bouton pour vider la console
-        self.clear_btn = ttk.Button(
-            header,
-            text="🗑️",
-            command=lambda: self.delete("1.0", "end"),
-            bootstyle="dark-outline",
-            width=3
-        )
-        self.clear_btn.pack(side="right", padx=5)
-        
+                
         # Zone de texte avec style moderne
         super().__init__(
             self.container,
